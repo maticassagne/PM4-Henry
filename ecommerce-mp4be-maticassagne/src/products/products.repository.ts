@@ -1,131 +1,77 @@
 import { Injectable } from '@nestjs/common';
-
-type Product = {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: boolean;
-  imgUrl: string;
-};
-
-const products = [
-  {
-    id: '1',
-    name: 'Donuts de Homer',
-    description: 'Deliciosos donuts glaseados, favoritos de Homer Simpson.',
-    price: 2.5,
-    stock: true,
-    imgUrl: 'https://example.com/donuts.jpg',
-  },
-  {
-    id: '2',
-    name: 'Cerveza Duff',
-    description: 'La famosa cerveza de Springfield, perfecta para relajarse.',
-    price: 3.0,
-    stock: true,
-    imgUrl: 'https://example.com/duffbeer.jpg',
-  },
-  {
-    id: '3',
-    name: 'Figurita de Bart',
-    description: 'Figurita coleccionable de Bart Simpson en su patineta.',
-    price: 15.0,
-    stock: true,
-    imgUrl: 'https://example.com/bartfigurine.jpg',
-  },
-  {
-    id: '4',
-    name: 'Camisa de Marge',
-    description:
-      'Camisa azul inspirada en el icónico atuendo de Marge Simpson.',
-    price: 25.0,
-    stock: false,
-    imgUrl: 'https://example.com/marge-shirt.jpg',
-  },
-  {
-    id: '5',
-    name: 'Juego de mesa de Los Simpson',
-    description:
-      'Diviértete con este juego de mesa basado en la familia Simpson.',
-    price: 30.0,
-    stock: true,
-    imgUrl: 'https://example.com/simpsonsboardgame.jpg',
-  },
-  {
-    id: '6',
-    name: 'Muñeco de Lisa',
-    description: 'Muñeco de acción de Lisa Simpson, con su saxofón.',
-    price: 20.0,
-    stock: true,
-    imgUrl: 'https://example.com/lisamuñeco.jpg',
-  },
-  {
-    id: '7',
-    name: 'Camiseta de Springfield',
-    description: 'Camiseta con el logo de Springfield, ideal para fanáticos.',
-    price: 18.0,
-    stock: true,
-    imgUrl: 'https://example.com/springfield-shirt.jpg',
-  },
-  {
-    id: '8',
-    name: 'Taza de Moe',
-    description: 'Taza de café de Moe Szyslak, perfecta para tus mañanas.',
-    price: 10.0,
-    stock: true,
-    imgUrl: 'https://example.com/moe-mug.jpg',
-  },
-  {
-    id: '9',
-    name: 'Póster de Los Simpson',
-    description:
-      'Póster colorido de la familia Simpson para decorar tu habitación.',
-    price: 12.0,
-    stock: true,
-    imgUrl: 'https://example.com/simpsons-poster.jpg',
-  },
-  {
-    id: '10',
-    name: 'Gorra de Krusty',
-    description: 'Gorra con el logo de Krusty el payaso, ideal para los fans.',
-    price: 15.0,
-    stock: false,
-    imgUrl: 'https://example.com/krusty-hat.jpg',
-  },
-];
+import { InjectRepository } from '@nestjs/typeorm';
+import { Product } from './entities/products.entity';
+import { Repository } from 'typeorm';
+import { Category } from 'src/categories/entities/categories.entity';
+import * as data from '../helpers/data.json';
 
 @Injectable()
 export class ProductsRepository {
+  constructor(
+    @InjectRepository(Product) private productsRepository: Repository<Product>,
+    @InjectRepository(Category)
+    private categoriesRepository: Repository<Category>,
+  ) {}
+
   async getAllProducts(page: number, limit: number) {
+    let products = await this.productsRepository.find({
+      relations: { category: true },
+    });
     const start = (page - 1) * limit;
     const end = start + limit;
-    const productList = products.slice(start, end);
-    return await productList;
+    products = products.slice(start, end);
+    return products;
   }
 
   async getProductById(id: string) {
-    const foundProduct = await products.find((p) => p.id === id);
+    const foundProduct = await this.productsRepository.findOneBy({ id });
+    if (!foundProduct) {
+      return `Producto con id: ${id} no encontrado`;
+    }
     return foundProduct;
   }
 
-  async newProduct(product: any) {
-    await products.push({ id: product.name, ...product });
-    const newProduct = products[products.length - 1];
-    return newProduct.id;
+  async newProduct(product: any) {}
+
+  async addProduct() {
+    const categories = await this.categoriesRepository.find();
+    await Promise.all(
+      data.map(async (element) => {
+        const category = categories.find(
+          (category) => category.name === element.category,
+        );
+        if (!category)
+          throw new Error(`La categoria ${element.category} no existe`);
+        const product = new Product();
+        product.name = element.name;
+        product.description = element.description;
+        product.price = element.price;
+        product.stock = element.stock;
+        product.category = category;
+        await this.productsRepository
+          .createQueryBuilder()
+          .insert()
+          .into(Product)
+          .values(product)
+          .orUpdate(['description', 'price', 'imgUrl', 'stock'], ['name'])
+          .execute();
+      }),
+    );
+    return 'Productos agregados exitosamente';
   }
 
   async updateProduct(id: string, product: any) {
-    const index = await products.findIndex((p) => p.id === id);
-    if (index === -1) return 'No se encontró el producto';
-    products[index] = { ...products[index], ...product };
-    return products[index].id;
+    await this.productsRepository.update(id, product);
+    const updatedProduct = await this.productsRepository.findOneBy({ id });
+    return updatedProduct;
   }
 
   async deleteProduct(id: string) {
-    const index = await products.findIndex((p) => p.id === id);
-    if (index === -1) return 'No se encontró el producto';
-    await products.splice(index, 1);
-    return id;
+    const foundProduct = await this.productsRepository.findOneBy({ id });
+    if (!foundProduct) {
+      return `Producto con id ${id} no encontrado`;
+    }
+    await this.productsRepository.delete(foundProduct);
+    return `Producto con id ${id} eliminado exitosamente`;
   }
 }

@@ -25,6 +25,11 @@ export class ProductsController {
     }
   }
 
+  @Get('seeder')
+  addProduct() {
+    return this.productService.addProduct();
+  }
+
   @Get(':id')
   getProductById(@Param('id') id: string) {
     return this.productService.getProductsById(id);

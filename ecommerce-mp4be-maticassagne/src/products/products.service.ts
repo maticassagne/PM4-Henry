@@ -4,12 +4,17 @@ import { ProductsRepository } from './products.repository';
 @Injectable()
 export class ProductsService {
   constructor(private productsRepository: ProductsRepository) {}
+
   getProducts(page: number, limit: number) {
     return this.productsRepository.getAllProducts(page, limit);
   }
 
   getProductsById(id: string) {
     return this.productsRepository.getProductById(id);
+  }
+
+  addProduct() {
+    return this.productsRepository.addProduct();
   }
 
   createProduct(product: any) {
