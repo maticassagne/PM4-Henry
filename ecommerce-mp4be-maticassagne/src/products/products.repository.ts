@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/products.entity';
 import { Repository } from 'typeorm';
@@ -26,7 +26,7 @@ export class ProductsRepository {
   async getProductById(id: string) {
     const foundProduct = await this.productsRepository.findOneBy({ id });
     if (!foundProduct) {
-      return `Producto con id: ${id} no encontrado`;
+      throw new NotFoundException(`Producto con id: ${id} no encontrado`);
     }
     return foundProduct;
   }
@@ -41,7 +41,9 @@ export class ProductsRepository {
           (category) => category.name === element.category,
         );
         if (!category)
-          throw new Error(`La categoria ${element.category} no existe`);
+          throw new NotFoundException(
+            `La categoria ${element.category} no existe`,
+          );
         const product = new Product();
         product.name = element.name;
         product.description = element.description;
@@ -69,7 +71,7 @@ export class ProductsRepository {
   async deleteProduct(id: string) {
     const foundProduct = await this.productsRepository.findOneBy({ id });
     if (!foundProduct) {
-      return `Producto con id ${id} no encontrado`;
+      throw new NotFoundException(`Producto con id ${id} no encontrado`);
     }
     await this.productsRepository.delete(foundProduct);
     return `Producto con id ${id} eliminado exitosamente`;

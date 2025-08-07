@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -31,7 +32,7 @@ export class ProductsController {
   }
 
   @Get(':id')
-  getProductById(@Param('id') id: string) {
+  getProductById(@Param() { id }: ParamsWithIdDto) {
     return this.productService.getProductsById(id);
   }
 
@@ -43,13 +44,13 @@ export class ProductsController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  updateProduct(@Param('id') id: string, @Body() product: any) {
+  updateProduct(@Param() { id }: ParamsWithIdDto, @Body() product: any) {
     return this.productService.updateProduct(id, product);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  deleteProduct(@Param('id') id: string) {
+  deleteProduct(@Param() { id }: ParamsWithIdDto) {
     return this.productService.deleteProduc(id);
   }
 }

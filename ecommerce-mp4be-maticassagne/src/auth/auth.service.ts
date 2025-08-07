@@ -9,9 +9,9 @@ export class AuthService {
     return `Todos los auth`;
   }
 
-  signIn(email: string, password: string) {
+  async signIn(email: string, password: string) {
     if (!email || !password) return 'Credenciales incorrectas';
-    const user = this.userRepository.getUserByEmail(email);
+    const user = await this.userRepository.getUserByEmail(email);
     if (!user || user.password !== password) return 'Credenciales incorrectas';
     return 'Usuario logeado con exito (TOKEN)';
   }

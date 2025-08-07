@@ -11,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
 
 @Controller('users')
 export class UsersController {
@@ -26,24 +28,24 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AuthGuard)
-  getUserById(@Param('id') id: string) {
+  getUserById(@Param() { id }: ParamsWithIdDto) {
     return this.usersService.getUserById(id);
   }
 
   @Post()
-  createUser(@Body() user: any) {
+  createUser(@Body() user: CreateUserDto) {
     return this.usersService.addUser(user);
   }
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  updateUser(@Param('id') id: string, @Body() user: any) {
+  updateUser(@Param() { id }: ParamsWithIdDto, @Body() user: UpdateUserDto) {
     return this.usersService.updateUser(id, user);
   }
 
   @Delete(':id')
   @UseGuards(AuthGuard)
-  deleteUser(@Param('id') id: string) {
+  deleteUser(@Param() { id }: ParamsWithIdDto) {
     return this.usersService.deleteUser(id);
   }
 }
