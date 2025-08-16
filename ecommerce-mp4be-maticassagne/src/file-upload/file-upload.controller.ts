@@ -13,12 +13,37 @@ import { FileUploadService } from './file-upload.service';
 import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 
 @Controller('files')
 export class FileUploadController {
   constructor(private readonly fileUploadService: FileUploadService) {}
 
   @Post('uploadImage/:id')
+  @ApiOperation({ summary: 'Carga de imagen para producto' })
+  @ApiParam({ name: 'id', description: 'Id del producto', type: String })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary', //Buffer
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Imagen Cargada correctamente' })
+  @ApiResponse({ status: 400, description: 'Error al cargar la imagen' })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async upLoadImage(

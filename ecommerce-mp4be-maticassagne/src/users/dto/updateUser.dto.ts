@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsNumber,
   IsOptional,
@@ -8,12 +9,21 @@ import {
 } from 'class-validator';
 
 export class UpdateUserDto {
+  @ApiProperty({
+    description: 'Debe ser un string entre 3 y 50 caracteres',
+    example: 'Tester User 2',
+  })
   @IsOptional()
   @IsString()
   @MinLength(3, { message: 'El nombre debe tener al menos 3 caracteres.' })
   @MaxLength(50, { message: 'El nombre no puede exceder los 50 caracteres.' })
   name?: string;
 
+  @ApiProperty({
+    description:
+      'La contraseña debe contener una letra minuscula, una mayuscula, un numero y un caracter especial, con un minimo de 8 caracteres y un maximo de 20',
+    example: 'Strong#Pass1!',
+  })
   @IsOptional()
   @IsStrongPassword(
     {
@@ -33,16 +43,28 @@ export class UpdateUserDto {
   })
   password?: string;
 
+  @ApiProperty({
+    description: 'Debe ser un numero.',
+    example: '12345678',
+  })
   @IsOptional()
   @IsNumber()
   phone?: number;
 
+  @ApiProperty({
+    description: 'Debe ser un string entre 5 y 20 caracteres',
+    example: 'Test Country',
+  })
   @IsOptional()
   @IsString()
   @MinLength(5, { message: 'El país debe tener al menos 5 caracteres.' })
   @MaxLength(20, { message: 'El país no debe exceder los 20 caracteres.' })
   country?: string;
 
+  @ApiProperty({
+    description: 'Debe ser un string entre 3 y 80 caracteres.',
+    example: 'Test street',
+  })
   @IsOptional()
   @IsString()
   @MinLength(3, { message: 'La direccion debe tener al menos 3 caracteres.' })
@@ -51,6 +73,10 @@ export class UpdateUserDto {
   })
   address?: string;
 
+  @ApiProperty({
+    description: 'Debe ser un string entre 5 y 20 caracteres,',
+    example: 'Test City',
+  })
   @IsOptional()
   @IsString()
   @MinLength(5, { message: 'La ciudad debe tener al menos 5 caracteres.' })

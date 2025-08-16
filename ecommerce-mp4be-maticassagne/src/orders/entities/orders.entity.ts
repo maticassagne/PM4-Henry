@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { OrderDetails } from 'src/orderDetails/entities/orderDetails.entity';
 import { User } from 'src/users/entities/users.entity';
 import {
@@ -11,9 +12,16 @@ import {
 
 @Entity({ name: 'orders' })
 export class Order {
+  @ApiProperty({
+    description: 'UUID v4 generado automaticamente por la DDBB',
+  })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ApiProperty({
+    description: 'Fecha en formato DD/MM/YYYY',
+    example: '14/08/2025',
+  })
   @Column()
   date: Date;
 

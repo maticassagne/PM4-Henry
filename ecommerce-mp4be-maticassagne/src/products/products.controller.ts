@@ -17,6 +17,7 @@ import { ERoles } from 'src/auth/roles.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Product } from './entities/products.entity';
 import { CreateProductDto } from './dto/createProduct.dto';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('products')
 export class ProductsController {
@@ -32,6 +33,7 @@ export class ProductsController {
   }
 
   @Get('seeder')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   addProduct() {
     return this.productService.addProduct();
@@ -43,6 +45,7 @@ export class ProductsController {
   }
 
   @Post()
+  @ApiBearerAuth()
   @Roles(ERoles.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   createProduct(@Body() product: CreateProductDto) {
@@ -50,6 +53,7 @@ export class ProductsController {
   }
 
   @Put(':id')
+  @ApiBearerAuth()
   @Roles(ERoles.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   updateProduct(
@@ -60,6 +64,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   deleteProduct(@Param() { id }: ParamsWithIdDto) {
     return this.productService.deleteProduc(id);

@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
   IsNotEmpty,
@@ -7,11 +8,21 @@ import {
 } from 'class-validator';
 
 export class LoginUserDto {
+  @ApiProperty({
+    description:
+      'El campo es requerido. Debe ser un email valido con un maximo de 50 caracteres',
+    example: 'tester@mail.com',
+  })
   @IsNotEmpty()
   @MaxLength(50)
   @IsEmail()
   email: string;
 
+  @ApiProperty({
+    description:
+      'El campo es requerido. La contraseña debe contener una letra minuscula, una mayuscula, un numero y un caracter especial, con un minimo de 8 caracteres y un maximo de 20',
+    example: 'Strong#Pass1!',
+  })
   @IsNotEmpty({ message: 'La contraseña es requira.' })
   @IsStrongPassword(
     {

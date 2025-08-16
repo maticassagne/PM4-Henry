@@ -5,7 +5,6 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
-  Post,
   Put,
   Query,
   UseGuards,
@@ -17,12 +16,14 @@ import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
 import { Roles } from 'src/decorators/roles.decorator';
 import { ERoles } from 'src/auth/roles.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
+  @ApiBearerAuth()
   @Roles(ERoles.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   getUsers(@Query('page') page: string, @Query('limit') limit: string) {
@@ -32,12 +33,14 @@ export class UsersController {
   }
 
   @Get(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   getUserById(@Param() { id }: ParamsWithIdDto) {
     return this.usersService.getUserById(id);
   }
 
   @Put(':id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   updateUser(
     @Param('id', ParseUUIDPipe) id: string,
@@ -47,6 +50,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @ApiBearerAuth()
   @Roles(ERoles.Admin)
   @UseGuards(AuthGuard, RolesGuard)
   deleteUser(@Param('id', ParseUUIDPipe) id: string) {

@@ -10,7 +10,7 @@ const config = {
   username: ENV.DB_USERNAME,
   password: ENV.DB_PASSWORD,
   entities: ['dist/**/*.entity{.ts,.js}'],
-  migration: ['dist/migration/*{.ts,.js}'],
+  migration: ['dist/migrations/*{.ts,.js}'],
   autoLoadEntities: true,
   logging: ['error'],
   synchronize: false,
