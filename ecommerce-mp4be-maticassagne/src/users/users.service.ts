@@ -13,9 +13,9 @@ export class UsersService {
     return this.userRepository.getUserById(id);
   }
 
-  addUser(user: User) {
-    return this.userRepository.newUser(user);
-  }
+  // addUser(user: Partial<User>) {
+  //   return this.userRepository.newUser(user);
+  // }
 
   updateUser(id: string, user: Partial<User>) {
     return this.userRepository.updateUser(id, user);

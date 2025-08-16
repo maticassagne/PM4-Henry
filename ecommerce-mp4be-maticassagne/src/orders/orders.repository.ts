@@ -34,20 +34,18 @@ export class OrderRepository {
     return order;
   }
 
-  async addOrder(userId: string, products: any) {
-    let total = 0;
+  async addOrder(userId: string, products: Partial<Product>[]) {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException(`Usuario con id ${userId} no encontrado.`);
     }
-    //Crear orden
+
     const order = new Order();
     order.date = new Date();
     order.user = user;
 
     const newOrder = await this.orderRepository.save(order);
 
-    //Asociar id con product
     const productsArray = await Promise.all(
       products.map(async (element) => {
         const product = await this.productRepository.findOneBy({
@@ -56,9 +54,7 @@ export class OrderRepository {
         if (!product) {
           throw new NotFoundException('Producto no encontrado');
         }
-        //Calculo total
-        total += Number(product.price);
-        //Actualizar stock
+
         await this.productRepository.update(
           { id: element.id },
           { stock: product.stock - 1 },
@@ -66,6 +62,12 @@ export class OrderRepository {
         return product;
       }),
     );
+
+    const total = productsArray.reduce(
+      (sum, product) => sum + Number(product.price),
+      0,
+    );
+
     const orderDetail = new OrderDetails();
 
     orderDetail.price = Number(Number(total).toFixed(2));

@@ -12,6 +12,11 @@ import {
 import { ProductsService } from './products.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { ERoles } from 'src/auth/roles.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { Product } from './entities/products.entity';
+import { CreateProductDto } from './dto/createProduct.dto';
 
 @Controller('products')
 export class ProductsController {
@@ -27,6 +32,7 @@ export class ProductsController {
   }
 
   @Get('seeder')
+  @UseGuards(AuthGuard)
   addProduct() {
     return this.productService.addProduct();
   }
@@ -37,14 +43,19 @@ export class ProductsController {
   }
 
   @Post()
-  @UseGuards(AuthGuard)
-  createProduct(@Body() product: any) {
+  @Roles(ERoles.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  createProduct(@Body() product: CreateProductDto) {
     return this.productService.createProduct(product);
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard)
-  updateProduct(@Param() { id }: ParamsWithIdDto, @Body() product: any) {
+  @Roles(ERoles.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  updateProduct(
+    @Param() { id }: ParamsWithIdDto,
+    @Body() product: Partial<Product>,
+  ) {
     return this.productService.updateProduct(id, product);
   }
 

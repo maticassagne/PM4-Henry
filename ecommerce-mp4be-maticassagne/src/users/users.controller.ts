@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Post,
   Put,
   Query,
@@ -11,15 +12,19 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/guards/auth.guard';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { UpdateUserDto } from './dto/updateUser.dto';
 import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
+import { Roles } from 'src/decorators/roles.decorator';
+import { ERoles } from 'src/auth/roles.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  @UseGuards(AuthGuard)
+  @Roles(ERoles.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
   getUsers(@Query('page') page: string, @Query('limit') limit: string) {
     if (page && limit)
       return this.usersService.getUsers(Number(page), Number(limit));
@@ -32,20 +37,19 @@ export class UsersController {
     return this.usersService.getUserById(id);
   }
 
-  @Post()
-  createUser(@Body() user: CreateUserDto) {
-    return this.usersService.addUser(user);
-  }
-
   @Put(':id')
   @UseGuards(AuthGuard)
-  updateUser(@Param() { id }: ParamsWithIdDto, @Body() user: UpdateUserDto) {
+  updateUser(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() user: UpdateUserDto,
+  ) {
     return this.usersService.updateUser(id, user);
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard)
-  deleteUser(@Param() { id }: ParamsWithIdDto) {
+  @Roles(ERoles.Admin)
+  @UseGuards(AuthGuard, RolesGuard)
+  deleteUser(@Param('id', ParseUUIDPipe) id: string) {
     return this.usersService.deleteUser(id);
   }
 }

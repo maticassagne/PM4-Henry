@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { OrderRepository } from './orders.repository';
 import { Product } from 'src/products/entities/products.entity';
 
@@ -6,11 +6,11 @@ import { Product } from 'src/products/entities/products.entity';
 export class OrdersService {
   constructor(private readonly ordersRepository: OrderRepository) {}
 
-  getOrder(id: string) {
-    return this.ordersRepository.getOrder(id);
+  async getOrder(id: string) {
+    return await this.ordersRepository.getOrder(id);
   }
 
-  addOrder(userId: string, product: Partial<Product>[]) {
+  async addOrder(userId: string, product: Partial<Product>[]) {
     return this.ordersRepository.addOrder(userId, product);
   }
 }

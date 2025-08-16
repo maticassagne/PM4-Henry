@@ -16,7 +16,7 @@ export class UserRepository {
       skip: skip,
     });
 
-    return users.map(({ password, ...userNoPassword }) => userNoPassword);
+    return users.map(({ password, ...userFiltered }) => userFiltered);
   }
 
   async getUserById(id: string) {
@@ -27,14 +27,20 @@ export class UserRepository {
     if (!user) {
       throw new NotFoundException(`No se encontro el usuario con id ${id}`);
     }
-    const { password, ...userNoPassword } = user;
-    return userNoPassword;
+    const { password, isAdmin, ...userFiletered } = user;
+    return userFiletered;
   }
 
   async newUser(user: User) {
-    const newUser = await this.userRepository.save(user);
-    const { password, ...userNoPassword } = newUser;
-    return userNoPassword;
+    const newUser = this.userRepository.create(user);
+    await this.userRepository.save(newUser);
+    const dbUser = await this.userRepository.findOneBy({ id: newUser.id });
+    if (!dbUser)
+      throw new NotFoundException(
+        `Usuario de id ${newUser.id}, no se pudo recuperar de la base de datos`,
+      );
+    const { password, isAdmin, ...userFiletered } = dbUser;
+    return userFiletered;
   }
 
   async updateUser(id: string, user: Partial<User>) {
@@ -43,8 +49,8 @@ export class UserRepository {
     if (!updateUser) {
       throw new NotFoundException(`Usuario con id ${id} no encontrado`);
     }
-    const { password, ...userNoPassword } = updateUser;
-    return userNoPassword;
+    const { password, isAdmin, ...userFiletered } = updateUser;
+    return userFiletered;
   }
 
   async deleteUser(id: string) {
@@ -58,9 +64,16 @@ export class UserRepository {
 
   async getUserByEmail(email: string) {
     const foundUser = await this.userRepository.findOneBy({ email });
+    this.userRepository.find;
     if (!foundUser) {
       throw new NotFoundException(`Usuario con email ${email} no encontrado.`);
     }
+    const { password, isAdmin, ...userFiletered } = foundUser;
+    return userFiletered;
+  }
+
+  async findUserByEmail(email: string) {
+    const foundUser = await this.userRepository.findOneBy({ email });
     return foundUser;
   }
 }

@@ -1,31 +1,33 @@
 import { Injectable } from '@nestjs/common';
 import { ProductsRepository } from './products.repository';
+import { Product } from './entities/products.entity';
+import { CreateProductDto } from './dto/createProduct.dto';
 
 @Injectable()
 export class ProductsService {
   constructor(private productsRepository: ProductsRepository) {}
 
-  getProducts(page: number, limit: number) {
-    return this.productsRepository.getAllProducts(page, limit);
+  async getProducts(page: number, limit: number) {
+    return await this.productsRepository.getAllProducts(page, limit);
   }
 
-  getProductsById(id: string) {
-    return this.productsRepository.getProductById(id);
+  async getProductsById(id: string) {
+    return await this.productsRepository.getProductById(id);
   }
 
-  addProduct() {
-    return this.productsRepository.addProduct();
+  async addProduct() {
+    return await this.productsRepository.addProduct();
   }
 
-  createProduct(product: any) {
-    return this.productsRepository.newProduct(product);
+  async createProduct(product: CreateProductDto) {
+    return await this.productsRepository.newProduct(product);
   }
 
-  updateProduct(id: string, product: any) {
-    return this.productsRepository.updateProduct(id, product);
+  async updateProduct(id: string, product: any) {
+    return await this.productsRepository.updateProduct(id, product);
   }
 
-  deleteProduc(id: string) {
-    return this.productsRepository.deleteProduct(id);
+  async deleteProduc(id: string) {
+    return await this.productsRepository.deleteProduct(id);
   }
 }

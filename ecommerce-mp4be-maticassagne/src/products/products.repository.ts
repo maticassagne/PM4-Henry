@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/products.entity';
 import { Repository } from 'typeorm';
@@ -31,7 +35,32 @@ export class ProductsRepository {
     return foundProduct;
   }
 
-  async newProduct(product: any) {}
+  async newProduct(product: Product) {
+    const { name, category } = product;
+    const foundProductName = await this.productsRepository.findOneBy({ name });
+    if (foundProductName)
+      throw new BadRequestException(
+        'El producto ya se encuentra cargado en la base de datos',
+      );
+    const foundCategory = await this.categoriesRepository.findOneBy({
+      name: category.name,
+    });
+    if (!foundCategory) {
+      await this.categoriesRepository.save({ name: category.name });
+    }
+    const categoryDb = await this.categoriesRepository.findOneBy({
+      name: category.name,
+    });
+    if (!categoryDb)
+      throw new BadRequestException(
+        'Error al cargar la categoria en base de datos',
+      );
+    const newProduct = this.productsRepository.create({
+      ...product,
+      category: categoryDb,
+    });
+    return await this.productsRepository.save(newProduct);
+  }
 
   async addProduct() {
     const categories = await this.categoriesRepository.find();
@@ -62,7 +91,7 @@ export class ProductsRepository {
     return 'Productos agregados exitosamente';
   }
 
-  async updateProduct(id: string, product: any) {
+  async updateProduct(id: string, product: Partial<Product>) {
     await this.productsRepository.update(id, product);
     const updatedProduct = await this.productsRepository.findOneBy({ id });
     return updatedProduct;
@@ -73,7 +102,7 @@ export class ProductsRepository {
     if (!foundProduct) {
       throw new NotFoundException(`Producto con id ${id} no encontrado`);
     }
-    await this.productsRepository.delete(foundProduct);
+    await this.productsRepository.remove(foundProduct);
     return `Producto con id ${id} eliminado exitosamente`;
   }
 }
