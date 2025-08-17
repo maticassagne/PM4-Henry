@@ -1,8 +1,8 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/createOrder.dto';
-import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { ParamsWithIdDto } from '../common/dto/idParams.dto';
+import { AuthGuard } from '../auth/guards/auth.guard';
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('orders')

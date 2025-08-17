@@ -1,4 +1,4 @@
-import { Order } from 'src/orders/entities/orders.entity';
+import { Order } from '../../orders/entities/orders.entity';
 import {
   Column,
   Entity,

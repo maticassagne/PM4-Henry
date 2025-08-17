@@ -10,9 +10,9 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileUploadService } from './file-upload.service';
-import { ParamsWithIdDto } from 'src/common/dto/idParams.dto';
+import { ParamsWithIdDto } from '../common/dto/idParams.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AuthGuard } from 'src/auth/guards/auth.guard';
+import { AuthGuard } from '../auth/guards/auth.guard';
 import {
   ApiBearerAuth,
   ApiBody,

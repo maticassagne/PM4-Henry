@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ArrayMinSize, IsArray, IsNotEmpty, IsUUID } from 'class-validator';
-import { Product } from 'src/products/entities/products.entity';
+import { Product } from '../../products/entities/products.entity';
 
 export class CreateOrderDto {
   @ApiProperty({
