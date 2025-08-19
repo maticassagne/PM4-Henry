@@ -16,6 +16,9 @@ const ENV = {
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
   JWT_SECRET: process.env.JWT_SECRET,
+
+  POSTGRES_PASSWORD: process.env.POSTGRES_PASSWORD,
+  POSTGRES_DB: process.env.POSTGRES_DB,
 };
 
 export default ENV;

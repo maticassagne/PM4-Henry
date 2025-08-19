@@ -13,7 +13,7 @@ const config = {
   migration: ['dist/migrations/*{.ts,.js}'],
   autoLoadEntities: true,
   logging: ['error'],
-  synchronize: false,
+  synchronize: true,
   dropSchema: false,
 };
 
